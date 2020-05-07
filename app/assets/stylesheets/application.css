@@ -1,0 +1,164 @@
+input[type=checkbox] {
+    display: none;
+}
+
+label>input[type=checkbox]~span {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 90px;
+    height: 28px;
+    font-size: 14px;
+    border-style: none;
+    border-radius: 15px;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+}
+
+
+/* ---- スイッチがONのとき ---- */
+
+label>input[type=checkbox]:checked+span {
+    display: flex;
+    /* ---- ボタンのデザイン ---- */
+    padding-left: 8px;
+    color: white;
+    background-color: dodgerblue;
+}
+
+label>input[type=checkbox]:checked+span+span {
+    display: none;
+}
+
+
+/* ---- スイッチがOFFのとき ---- */
+
+label>input[type=checkbox]+span {
+    display: none;
+}
+
+label>input[type=checkbox]+span+span {
+    display: flex;
+    /* ---- ボタンのデザイン ---- */
+    padding-right: 8px;
+    color: gray;
+    background-color: lightgray;
+}
+
+
+/* ---- 丸ボタンのデザイン ---- */
+
+label>input[type=checkbox]:checked+span::after,
+label>input[type=checkbox]+span+span::before {
+    display: block;
+    vertical-align: middle;
+    width: 24px;
+    height: 24px;
+    margin: 3px;
+    border-radius: 50%;
+    background-color: white;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+    content: "";
+}
+
+#clb {
+    float: right;
+    margin-top: 2px;
+    margin-right: 2px;
+}
+
+.vue-modal {
+    z-index: 1;
+    background-color: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    align-items: center;
+    justify-content: center;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+
+/*-------------------------------------------------*/
+
+.menu,
+.menu-item {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.container {
+    height: 100%;
+}
+
+.menu {
+    color: #fff;
+    position: fixed;
+    margin-top: 0px;
+    width: 45px;
+    height: 40px;
+    white-space: nowrap;
+    overflow: hidden;
+    transition: width 0.1s ease-in;
+    transition-delay: 0.3s;
+}
+
+.contents {
+    background: #eee;
+    height: 100%;
+    padding: 0px;
+    box-sizing: border-box;
+    margin-left: 0px;
+}
+
+.brand {
+    height: 70px;
+    background-image: url('https://res.cloudinary.com/hkldfk58b/image/upload/v1587358846/areckuktvosq8gsfdjyt.jpg');
+    background-size: 30px 30px;
+    border-radius: 5px;
+    background-repeat: no-repeat;
+    background-position: left 12px center;
+}
+
+.menu-item .fa {
+    font-size: 19px;
+    width: 45px;
+    text-align: center;
+}
+
+.menu-item {
+    background: #009999;
+    line-height: 35px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+    transition: color 0.3s ease-in-out;
+}
+
+.menu-item:hover {
+    background: #00dddd;
+    color: rgb(122, 122, 39);
+}
+
+.menu:hover {
+    width: 300px;
+    height: 200px;
+    top: 0px
+}
+
+.list-secondary {
+    list-style-type: disc;
+    margin: 0 0 0 auto;
+    height: 0;
+    overflow: hidden;
+    transition: height 0.5s;
+}
+
+li:hover>.list-secondary {
+    height: 80px;
+}
+
+.validation {
+    padding: 2px 3px;
+    border-radius: 4px;
+}

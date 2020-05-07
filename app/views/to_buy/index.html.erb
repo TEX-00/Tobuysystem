@@ -1,0 +1,330 @@
+<div id="app">
+
+    <div class="container-fluid" style="padding-left: 0;padding-right:0">
+        <ul class="menu">
+            <li class="menu-item">
+                <i class="fa fa-check" aria-hidden="true"></i>購入済み
+                <ul class="list-secondary">
+                    <li>
+                        購入済
+                        <label>
+                        <input type="checkbox" v-model="bought" >
+                        <span>含む</span><span>含まない</span></label>
+                    </li>
+                    <li>
+                        未購入
+                        <label>
+                        <input type="checkbox" v-model="unbought">
+                        <span>含む</span><span>含まない</span>
+                    </label>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="menu-item">
+                <i class="fa fa-user-circle" aria-hidden="true"></i>ユーザー
+                                <ul class="list-secondary">
+                    <li>
+                        自分の依頼
+                        <label>
+                        <input type="checkbox"  v-model="only_yours" >
+                        <span>のみ</span><span>不問</span></label>
+                    </li>
+                    <li>
+                        依頼人指定
+                        <label>
+                        <input type="text" class="form-control-sm"  v-model="user">
+
+                </label>
+                </ul>
+            </li>
+
+            <li class="menu-item">
+                <i class="fa fa-user" aria-hidden="true"></i>購入者
+                                <ul class="list-secondary">
+                    <li>
+                        自分の購入
+                        <label>
+                        <input type="checkbox"  v-model="your_bought" >
+                        <span>のみ</span><span>不問</span></label>
+                    </li>
+                    <li>
+                        購入者指定
+                        <label>
+                        <input type="text" class="form-control-sm"  v-model="bought_user">
+
+                </label>
+                </ul>
+            </li>
+        </ul>
+
+
+        <div class="contents" v-if="is_safe">
+            <h1 class="text-center"> 購入依頼リスト</h1>
+            <table class="text-center table table-bordered table-striped table-light">
+                <thead>
+                    <tr>
+                        <th class="text-center">
+                            
+                            対象
+                            <i class="fa fa-unsorted" v-if="rule_name !=='name' && rule_name !=='name_rev'" v-on:click="rule_change('name')"></i>                            
+                            <i class="fa fa-caret-square-o-down" v-if="rule_name === 'name'" v-on:click="rule_change('name_rev')"></i>
+                            <i class="fa fa-caret-square-o-up" v-if="rule_name === 'name_rev'" v-on:click="rule_change('name')"></i>
+                        </th>
+                        <th>個数</th>
+                        <th class="text-center">
+                            
+                             購入済み
+                             <i class="fa fa-unsorted" v-if="rule_name !=='bought' && rule_name !=='bought_rev'" v-on:click="rule_change('bought')"></i>
+                            <i class="fa fa-caret-square-o-down" v-if="rule_name === 'bought'" v-on:click="rule_change('bought_rev')"></i>
+                            <i class="fa fa-caret-square-o-up" v-if="rule_name === 'bought_rev'" v-on:click="rule_change('bought')"></i>    
+                        </th>
+                        <th>
+                            
+                            依頼者
+                            <i class="fa fa-unsorted" v-if="rule_name !=='user' && rule_name !=='user_rev'" v-on:click="rule_change('user')"></i>
+                            <i class="fa fa-caret-square-o-down" v-if="rule_name === 'user'" v-on:click="rule_change('user_rev')"></i>
+                            <i class="fa fa-caret-square-o-up" v-if="rule_name === 'user_rev'" v-on:click="rule_change('user')"></i>    
+                        </th>
+
+                        <th>購入者</th>
+                        <th>
+                            
+                            依頼日
+                            <i class="fa fa-unsorted" v-if="rule_name !=='date' && rule_name !=='date_rev'" v-on:click="rule_change('date')"></i>
+                            <i class="fa fa-caret-square-o-down" v-if="rule_name === 'date'" v-on:click="rule_change('date_rev')"></i>
+                            <i class="fa fa-caret-square-o-up" v-if="rule_name === 'date_rev'" v-on:click="rule_change('date')"></i>
+                        </th>
+                        <th>詳細</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr v-for="tobuy in filtered">
+                        <th class="text-center">{{ tobuy.name }}</td>
+                            <td class="text-center">{{ tobuy.count }}</td>
+                            <td>
+                                <button v-if="tobuy.is_done==true" @click="change_done(tobuy.id)" class="btn btn-primary">購入済み</button>
+                                <button v-if="tobuy.is_done==false" @click="change_done(tobuy.id)" class="btn btn-secondary">未購入</button>
+
+                            </td>
+                            <td class="text-center">{{ tobuy.who_wants.name}}</td>
+                            <td class="text-center">{{ tobuy.who_did!=null ? tobuy.who_did.name : ""}}</td>
+                            <td class="text-center">{{ tobuy.created_at.split("T")[0]}}</td>
+                            <td>
+                                <button class="btn btn-info" v-on:click="openmdw(tobuy.id)">詳細</button>
+                            </td>
+
+                    </tr>
+                </tbody>
+
+            </table>
+
+            <div class="vue-modal" v-if="detail_id != null">
+                <div class="card mx-auto" style="width: 60%;top:15px">
+                    <div class="card-header">
+                        <div class="card-title" id="ct">
+
+                            {{ detailed.name }}
+                            <i class="fa fa-window-close pull-right " v-on:click="detail_id=null" id="clb"></i>
+
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr class="bg-secondary" style="color: aliceblue;">
+                                    <th>項目名</th>
+                                    <th>中身</th>
+                                </tr>
+
+                                <tr>
+                                    <th>ID</th>
+                                    <td>{{ detailed.id}}</td>
+                                </tr>
+                                <tr>
+                                    <th>名前</th>
+                                    <td>{{ detailed.name}}</td>
+                                </tr>
+
+                                <tr>
+                                    <th>個数</th>
+                                    <td>{{ detailed.count}}</td>
+                                </tr>
+
+                                <tr>
+                                    <th>購入済み</th>
+                                    <td class="mx-auto">
+                                        <label>
+                                    <input type="checkbox" @change="change_from_modal(detailed.id)" v-bind:checked="detailed.is_done">
+
+                  <span>済み</span><span>未購入</span>
+
+                                            </label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>特記事項</th>
+                                    <td style="white-space:pre-wrap; word-wrap:break-word;">{{ detailed.special_option}}</td>
+                                </tr>
+                                <tr>
+                                    <th>依頼者</th>
+                                    <td>{{ detailed.who_wants.name}}</td>
+                                </tr>
+
+                                <tr>
+                                    <th>購入者</th>
+                                    <td>{{ detailed.who_did!=null ? detailed.who_did.name : ""}}</td>
+                                </tr>
+
+                                <tr>
+                                    <th>依頼日</th>
+                                    <td>{{detailed.created_at.split("T")[0]}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn btn-danger" v-on:click="send_delete(detailed.id)">
+                    削除する
+                </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    Vue.config.devtools = true;
+    var tblapp = new Vue({
+        el: '#app',
+        data: {
+            tobuys: [],
+            detail_id: null,
+            bought: true,
+            unbought: true,
+            is_safe: true,
+            only_yours: false,
+            user: "",
+            your_bought:false,
+            bought_user:"",
+            sort_rules:{
+                name: (a,b) => a.name <b.name ? 1:-1,
+                name_rev: (a,b) => a.name<b.name ? -1:1,
+                bought: (a,b)=> a.is_done == true && b.is_done ==false ? -1:1,
+                bought_rev: (a,b)=> a.is_done == false && b.is_done ==true ? -1:1,
+                user: (a,b) => a.who_wants.name <b.who_wants.name ? 1:-1,
+                user_rev: (a,b) => a.who_wants.name<b.who_wants.name ? -1:1,
+                date: (a,b) => a.created_at >b.created_at ? 1:-1,
+                date_rev: (a,b) => a.created_at<b.created_at ? -1:1,
+            },
+            sort_rule:(a,b) => a.name <b.name ? 1:-1,
+            rule_name:""
+        },
+
+
+
+
+        methods: {
+            load_list: function() {
+                axios.get("list_api")
+                    .then(response => {
+                        this.tobuys = response.data.tobuys;
+
+                    })
+            },
+            rule_change: function(name){
+                this.sort_rule=this.sort_rules[name]
+                this.rule_name=name
+            },
+            change_done: function(id) {
+                this.is_safe = false;
+                var targetid = this.tobuys.findIndex((it) => it.id == id)
+                var target = this.tobuys[targetid]
+                var is_done = target.is_done
+                axios.defaults.headers['X-CSRF-TOKEN'] = $('meta[name=csrf-token]').attr('content')
+                axios({
+                    url: "change",
+                    method: "POST",
+                    data: {
+                        id_done: {
+                            id: id,
+                            done: !is_done,
+                        }
+                    }
+                }).then(response => {
+
+                })
+
+                this.load_list()
+                this.is_safe = true;
+                this.$forceUpdate();
+            },
+            send_delete: function(id) {
+                var targetid = this.tobuys.findIndex((it) => it.id == id)
+                var target = this.tobuys[targetid]
+
+                axios.defaults.headers['X-CSRF-TOKEN'] = $('meta[name=csrf-token]').attr('content')
+                axios({
+                    url: "delete",
+                    method: "POST",
+                    data: {
+                        to_buy: target
+                    }
+                }).then(response => {
+                    alert(response.data)
+                })
+                this.load_list()
+                this.detail_id = null
+            },
+            change_from_modal: function(id) {
+                this.change_done(id);
+                this.openmdw(id)
+
+
+            },
+
+            openmdw: function(id) {
+                this.detail_id = id
+            }
+        },
+
+        mounted: function() {
+            this.load_list()
+        },
+        computed: {
+            detailed: function() {
+                id = this.tobuys.findIndex((it) => it.id == this.detail_id)
+                return this.tobuys[id]
+            },
+            filtered: function() {
+                var result = this.tobuys
+
+                if (this.bought === false) {
+                    result = result.filter(it => it.is_done === false)
+                }
+                if (this.unbought === false) {
+                    result = result.filter(it => it.is_done === true)
+                }
+
+                if (this.only_yours){
+                    result = result.filter(it => it.who_wants.id === your_id)
+                }
+            
+                result = result.filter(it => it.who_wants.name.includes(this.user))
+            
+                if (this.your_bought){
+                    result = result.filter(it => (it.who_did != null)&&(it.who_did.id === your_id))
+                }
+                if(this.bought_user!=""){
+                result = result.filter(it => (it.who_did != null)&&(it.who_did.name.includes(this.bought_user)))
+                }
+
+                result.sort(this.sort_rule)
+                return result
+            }
+        }
+    });
+    const your_id = <%= current_user.id %>
+</script>

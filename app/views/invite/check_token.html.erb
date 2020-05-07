@@ -1,0 +1,117 @@
+<div id ="app">
+
+<h1>新規登録</h1>
+
+<%= form_with(model:@user, url: @dest ,id: "user-create-form") do |f| %>
+
+    <div class="form-group">
+        <%= f.label :name%>
+        <span v-if="is_name_ok" class="alert-success validation">OK</span>
+        <span v-if="!is_name_ok" class="alert-danger validation">空の名前ではいけません</span>
+
+        <%= f.text_field :name , class: "form-control" , "v-model"=>"name"%>
+    </div>
+    <div class="form-group">
+        <%= f.label :email%>
+        <%= f.email_field :email , class: "form-control" , value: @user.email, readonly: true,"v-model"=>"email"%>
+    </div>
+
+    <div class="form-group">
+        <%= f.label :password%>
+        <span v-if="is_pw_ok" class="alert-success validation">OK</span>
+        <span v-if="!is_pw_ok" class="alert-danger validation">{{ pw_error }}</span>
+
+        <%= f.password_field :password , class: "form-control","v-model"=>"password"%>
+    </div>
+
+    <div class="form-group">
+        <%= f.label :password_confirmation%>       
+        <span v-if="is_same && is_pw_ok" class="alert-success validation">OK</span>
+        <span v-if="!is_pw_ok && is_same" class="alert-danger validation">パスワードが不正です</span>
+        <span v-if="!is_same" class="alert-danger validation">パスワードが違います</span>
+
+        <%= f.password_field :password_confirmation , class: "form-control","v-model"=>"password_confirmation"%>
+ 
+    </div>
+
+    <%= f.submit "登録!" , class: "btn btn-success","v-if"=>"is_ok"%>
+    <button v-if="!is_ok" class="btn btn-danger" @click.prevent="submit_fail">送信不可</button>
+<% end %>
+
+</div>
+
+
+<script>
+
+
+
+
+    const fap = new Vue({
+        el : "#app",
+        data:{
+            name:"",
+            email:"<%= @user.email%>",
+            password: "",
+            password_confirmation: "",
+
+        },
+        methods:{
+            submit_fail: function(){
+                alert("送信できません")
+            }
+        },
+        computed:{
+            is_same : function(){
+                return this.password === this.password_confirmation
+            },
+            is_pw_ok : function(){
+                if (this.password.length<8)
+                    return false
+                else if (!(/[a-z]/).test(this.password))
+                    return false
+                else if (!(/[A-Z]/).test(this.password))
+                    return false
+                else if (!(/[0-9]/).test(this.password))
+                    return false
+                return true               
+            },
+            pw_error : function(){
+                if (this.password.length <8)
+                    return "8文字以上必要"
+                else if (!(/[a-z]/).test(this.password))
+                    return "小文字が必要"
+                else if (!(/[A-Z]/).test(this.password))
+                    return "大文字が必要"
+                else if (!(/[0-9]/).test(this.password))
+                    return "数字が必要"
+                return ""  
+            },
+            is_name_ok: function(){
+                return this.name.length > 0
+            },
+            is_ok: function(){
+                return this.is_name_ok && this.is_pw_ok && this.is_same
+            }
+
+
+        }
+
+
+
+    })
+                $(document).ready(function() {
+                    $("#user-create-form").on("ajax:success", function(event) {
+                        [data, status, xhr] = event.detail
+                        alert(xhr.responseText)
+                        window.location.href='/login';
+
+
+
+                    }).on("ajax:error", function(event) {
+                        [data, status, xhr] = event.detail
+                        alert("登録失敗")
+
+})
+                })
+
+</script>

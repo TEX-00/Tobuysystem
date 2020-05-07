@@ -1,0 +1,2 @@
+module TobuylistHelper
+end

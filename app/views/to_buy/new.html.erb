@@ -1,0 +1,35 @@
+<%= form_for(@newtobuy, url:"create",data: {remote: true}) do |f|%>
+    <div class="form-group">
+        <%= f.label :name%>
+            <%= f.text_field :name, class: "form-control"%>
+    </div>
+
+    <div class="form-group">
+        <%= f.label :count%>
+            <%= f.number_field :count, class: "form-control"%>
+    </div>
+
+    <div class="form-group">
+        <%= f.label :special_option%>
+            <%= f.text_area :special_option, class: "form-control"%>
+    </div>
+
+
+    <%= f.submit "submit", class:"btn btn-success"%>
+        <%end%>
+
+            <div id="result"></div>
+            <script>
+                $(document).ready(function() {
+                    $("#new_to_buy").on("ajax:success", function(event) {
+                        [data, status, xhr] = event.detail
+                        alert(xhr.responseText)
+                        window.location.href='/';
+
+
+
+                    }).on("ajax:error", function(event) {
+                        alert("ERROR")
+                    })
+                })
+            </script>

@@ -50,20 +50,24 @@
         el : "#app",
         data:{
             name:"",
+            //メールアドレスに初期値を与える
             email:"<%= @user.email%>",
             password: "",
             password_confirmation: "",
 
         },
         methods:{
+            //正しくない場合送信を拒否しアラートを表示する
             submit_fail: function(){
                 alert("送信できません")
             }
         },
         computed:{
+            //パスワードと確認用パスワードが等しいか確認する
             is_same : function(){
                 return this.password === this.password_confirmation
             },
+            //パスワードが正しいか確認する
             is_pw_ok : function(){
                 if (this.password.length<8)
                     return false
@@ -75,6 +79,7 @@
                     return false
                 return true               
             },
+            //パスワードが正しくないときにその内容を入手する
             pw_error : function(){
                 if (this.password.length <8)
                     return "8文字以上必要"
@@ -86,9 +91,11 @@
                     return "数字が必要"
                 return ""  
             },
+            //名前が正しいか取得する
             is_name_ok: function(){
                 return this.name.length > 0
             },
+            //すべての項目が正しいか確認する
             is_ok: function(){
                 return this.is_name_ok && this.is_pw_ok && this.is_same
             }

@@ -1,9 +1,10 @@
 class ToBuyController < ApplicationController
     before_action :logged_in_user
+    #一覧表示の枠組みを渡す
     def index
-
     end
 
+    #削除機能、最終更新時間と依頼者が一致する必要あり
     def delete
 
         id = will_be_deleted[:id]
@@ -27,16 +28,12 @@ class ToBuyController < ApplicationController
 
         ToBuy.destroy(target.id)
 
-
         render plain: "OK deleted"
         return
-
-
-
-
     end
 
-
+    #購入済みかどうかを変更する機能
+    #購入済みを未購入に戻すのは購入者のみの権利
     def change_done
         id = change_params[:id]
         done = change_params[:done]
@@ -65,19 +62,20 @@ class ToBuyController < ApplicationController
             render plain:"You cant change" 
             return
         end
-
-
-
     end
 
+    #一覧をjsonで渡す
     def list_api
         temp = ToBuy.all
         render :json => {"tobuys":temp}
     end
+    
+    #新規作成機能
     def new
         @newtobuy = ToBuy.new
     end
 
+    #新規作成機能
     def create
         @newtobuy = initTobuy
         if @newtobuy.save!

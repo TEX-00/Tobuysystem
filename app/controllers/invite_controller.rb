@@ -1,10 +1,11 @@
 class InviteController < ApplicationController
     before_action :logged_in_user , only: [:new,:temp_create]
 
+    #一時ユーザー作成フォームの表示
     def new 
         @tempuser = Tmpuser.new
     end
-
+    #一時ユーザーを作成しメール送信
     def create_temp
 
         user = User.where(email: get_email[:email])
@@ -30,6 +31,7 @@ class InviteController < ApplicationController
         redirect_to "/" 
     end
 
+    #本登録用フォームの表示
     def check_token
         tmpuser = Tmpuser.where(uuid: params[:uuid]).first
 
@@ -45,6 +47,10 @@ class InviteController < ApplicationController
         @dest = "/auth/token/"+tmpuser.uuid
     end
 
+    #本登録処理
+    #トークンとメールアドレスが一時ユーザーと一致する必要あり
+    #名前は一文字以上
+    #パスワードは8文字以上、大文字-小文字-数字を含む必要あり
     def create_user
         uuid = params[:uuid]
 

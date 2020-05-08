@@ -20,6 +20,7 @@
 
             <div id="result"></div>
             <script>
+            //送信成功時のみリストに戻る
                 $(document).ready(function() {
                     $("#new_to_buy").on("ajax:success", function(event) {
                         [data, status, xhr] = event.detail

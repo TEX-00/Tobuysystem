@@ -23,7 +23,7 @@
 
             <li class="menu-item">
                 <i class="fa fa-user-circle" aria-hidden="true"></i>ユーザー
-                                <ul class="list-secondary">
+                <ul class="list-secondary">
                     <li>
                         自分の依頼
                         <label>
@@ -37,59 +37,59 @@
 
                 </label>
                 </ul>
-            </li>
+                </li>
 
-            <li class="menu-item">
-                <i class="fa fa-user" aria-hidden="true"></i>購入者
-                                <ul class="list-secondary">
-                    <li>
-                        自分の購入
-                        <label>
+                <li class="menu-item">
+                    <i class="fa fa-user" aria-hidden="true"></i>購入者
+                    <ul class="list-secondary">
+                        <li>
+                            自分の購入
+                            <label>
                         <input type="checkbox"  v-model="your_bought" >
                         <span>のみ</span><span>不問</span></label>
-                    </li>
-                    <li>
-                        購入者指定
-                        <label>
+                        </li>
+                        <li>
+                            購入者指定
+                            <label>
                         <input type="text" class="form-control-sm"  v-model="bought_user">
 
                 </label>
-                </ul>
-            </li>
+                    </ul>
+                    </li>
         </ul>
 
 
-        <div class="contents" v-if="is_safe">
+        <div class="contents">
             <h1 class="text-center"> 購入依頼リスト</h1>
             <table class="text-center table table-bordered table-striped table-light">
                 <thead>
                     <tr>
                         <th class="text-center">
-                            
+
                             対象
-                            <i class="fa fa-unsorted" v-if="rule_name !=='name' && rule_name !=='name_rev'" v-on:click="rule_change('name')"></i>                            
+                            <i class="fa fa-unsorted" v-if="rule_name !=='name' && rule_name !=='name_rev'" v-on:click="rule_change('name')"></i>
                             <i class="fa fa-caret-square-o-down" v-if="rule_name === 'name'" v-on:click="rule_change('name_rev')"></i>
                             <i class="fa fa-caret-square-o-up" v-if="rule_name === 'name_rev'" v-on:click="rule_change('name')"></i>
                         </th>
                         <th>個数</th>
                         <th class="text-center">
-                            
-                             購入済み
-                             <i class="fa fa-unsorted" v-if="rule_name !=='bought' && rule_name !=='bought_rev'" v-on:click="rule_change('bought')"></i>
+
+                            購入済み
+                            <i class="fa fa-unsorted" v-if="rule_name !=='bought' && rule_name !=='bought_rev'" v-on:click="rule_change('bought')"></i>
                             <i class="fa fa-caret-square-o-down" v-if="rule_name === 'bought'" v-on:click="rule_change('bought_rev')"></i>
-                            <i class="fa fa-caret-square-o-up" v-if="rule_name === 'bought_rev'" v-on:click="rule_change('bought')"></i>    
+                            <i class="fa fa-caret-square-o-up" v-if="rule_name === 'bought_rev'" v-on:click="rule_change('bought')"></i>
                         </th>
                         <th>
-                            
+
                             依頼者
                             <i class="fa fa-unsorted" v-if="rule_name !=='user' && rule_name !=='user_rev'" v-on:click="rule_change('user')"></i>
                             <i class="fa fa-caret-square-o-down" v-if="rule_name === 'user'" v-on:click="rule_change('user_rev')"></i>
-                            <i class="fa fa-caret-square-o-up" v-if="rule_name === 'user_rev'" v-on:click="rule_change('user')"></i>    
+                            <i class="fa fa-caret-square-o-up" v-if="rule_name === 'user_rev'" v-on:click="rule_change('user')"></i>
                         </th>
 
                         <th>購入者</th>
                         <th>
-                            
+
                             依頼日
                             <i class="fa fa-unsorted" v-if="rule_name !=='date' && rule_name !=='date_rev'" v-on:click="rule_change('date')"></i>
                             <i class="fa fa-caret-square-o-down" v-if="rule_name === 'date'" v-on:click="rule_change('date_rev')"></i>
@@ -119,7 +119,7 @@
                 </tbody>
 
             </table>
-
+            <!-- 詳細表示用モーダル -->
             <div class="vue-modal" v-if="detail_id != null">
                 <div class="card mx-auto" style="width: 60%;top:15px">
                     <div class="card-header">
@@ -155,12 +155,8 @@
                                 <tr>
                                     <th>購入済み</th>
                                     <td class="mx-auto">
-                                        <label>
-                                    <input type="checkbox" @change="change_from_modal(detailed.id)" v-bind:checked="detailed.is_done">
-
-                  <span>済み</span><span>未購入</span>
-
-                                            </label>
+                                        <button v-if="detailed.is_done==true" @click="change_done(detailed.id)" class="btn btn-primary">購入済み</button>
+                                        <button v-if="detailed.is_done==false" @click="change_done(detailed.id)" class="btn btn-secondary">未購入</button>
                                     </td>
                                 </tr>
                                 <tr>
@@ -200,33 +196,44 @@
     var tblapp = new Vue({
         el: '#app',
         data: {
+            //依頼オブジェクトを格納する配列
             tobuys: [],
+            //モーダル表示対象id,nullの時は表示しない
             detail_id: null,
+            //購入済みの物を表示するフラグ
             bought: true,
+            //未購入の物を表示するフラグ
             unbought: true,
-            is_safe: true,
+            //自分の依頼のみ表示するするフラグ
             only_yours: false,
+            //依頼者で絞り込む文字列
             user: "",
-            your_bought:false,
-            bought_user:"",
-            sort_rules:{
-                name: (a,b) => a.name <b.name ? 1:-1,
-                name_rev: (a,b) => a.name<b.name ? -1:1,
-                bought: (a,b)=> a.is_done == true && b.is_done ==false ? -1:1,
-                bought_rev: (a,b)=> a.is_done == false && b.is_done ==true ? -1:1,
-                user: (a,b) => a.who_wants.name <b.who_wants.name ? 1:-1,
-                user_rev: (a,b) => a.who_wants.name<b.who_wants.name ? -1:1,
-                date: (a,b) => a.created_at >b.created_at ? 1:-1,
-                date_rev: (a,b) => a.created_at<b.created_at ? -1:1,
+            //自分の購入のみ表示するフラグ
+            your_bought: false,
+            //購入者で絞り込むフラグ
+            bought_user: "",
+            //並べ替えルール集
+            sort_rules: {
+                name: (a, b) => a.name < b.name ? 1 : -1,
+                name_rev: (a, b) => a.name < b.name ? -1 : 1,
+                bought: (a, b) => a.is_done == true && b.is_done == false ? -1 : 1,
+                bought_rev: (a, b) => a.is_done == false && b.is_done == true ? -1 : 1,
+                user: (a, b) => a.who_wants.name < b.who_wants.name ? 1 : -1,
+                user_rev: (a, b) => a.who_wants.name < b.who_wants.name ? -1 : 1,
+                date: (a, b) => a.created_at > b.created_at ? 1 : -1,
+                date_rev: (a, b) => a.created_at < b.created_at ? -1 : 1,
             },
-            sort_rule:(a,b) => a.name <b.name ? 1:-1,
-            rule_name:""
+            //並べ替え初期値
+            sort_rule: (a, b) => a.name < b.name ? 1 : -1,
+            //並べ替えルール名
+            rule_name: ""
         },
 
 
 
 
         methods: {
+            //リストを取得する
             load_list: function() {
                 axios.get("list_api")
                     .then(response => {
@@ -234,10 +241,12 @@
 
                     })
             },
-            rule_change: function(name){
-                this.sort_rule=this.sort_rules[name]
-                this.rule_name=name
+            //現在の並べ替えルールを変更する
+            rule_change: function(name) {
+                this.sort_rule = this.sort_rules[name]
+                this.rule_name = name
             },
+            //購入済みフラグを変更するリクエストを送る
             change_done: function(id) {
                 this.is_safe = false;
                 var targetid = this.tobuys.findIndex((it) => it.id == id)
@@ -261,6 +270,7 @@
                 this.is_safe = true;
                 this.$forceUpdate();
             },
+            //削除リクエストを送信する
             send_delete: function(id) {
                 var targetid = this.tobuys.findIndex((it) => it.id == id)
                 var target = this.tobuys[targetid]
@@ -278,26 +288,29 @@
                 this.load_list()
                 this.detail_id = null
             },
+            //モーダルのボタンから購入済みフラグを変更するリクエストを送る
             change_from_modal: function(id) {
                 this.change_done(id);
                 this.openmdw(id)
 
 
             },
-
+            //モーダルを開く
             openmdw: function(id) {
                 this.detail_id = id
             }
         },
-
+        //初期ダウンロード
         mounted: function() {
             this.load_list()
         },
         computed: {
+            //詳細表示するオブジェクト
             detailed: function() {
                 id = this.tobuys.findIndex((it) => it.id == this.detail_id)
                 return this.tobuys[id]
             },
+            //フィルタリングと並び替えされた配列
             filtered: function() {
                 var result = this.tobuys
 
@@ -308,17 +321,17 @@
                     result = result.filter(it => it.is_done === true)
                 }
 
-                if (this.only_yours){
+                if (this.only_yours) {
                     result = result.filter(it => it.who_wants.id === your_id)
                 }
-            
+
                 result = result.filter(it => it.who_wants.name.includes(this.user))
-            
-                if (this.your_bought){
-                    result = result.filter(it => (it.who_did != null)&&(it.who_did.id === your_id))
+
+                if (this.your_bought) {
+                    result = result.filter(it => (it.who_did != null) && (it.who_did.id === your_id))
                 }
-                if(this.bought_user!=""){
-                result = result.filter(it => (it.who_did != null)&&(it.who_did.name.includes(this.bought_user)))
+                if (this.bought_user != "") {
+                    result = result.filter(it => (it.who_did != null) && (it.who_did.name.includes(this.bought_user)))
                 }
 
                 result.sort(this.sort_rule)
@@ -326,5 +339,6 @@
             }
         }
     });
+    //自分のid
     const your_id = <%= current_user.id %>
 </script>

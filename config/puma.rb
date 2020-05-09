@@ -19,7 +19,13 @@ environment ENV.fetch("RAILS_ENV") { "development" }
 # Specifies the `pidfile` that Puma will use.
 pidfile ENV.fetch("PIDFILE") { "tmp/pids/server.pid" }
 
-
+if 'development' == ENV.fetch('RAILS_ENV') { 'development' }
+    ssl_bind '0.0.0.0', '5001', {
+      key: 'config/certs/server.key',
+      cert: 'config/certs/server.crt',
+      verify_mode: "none"
+    }
+end
 
 
 

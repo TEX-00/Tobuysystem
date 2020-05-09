@@ -36,3 +36,4 @@ yarn-debug.log*
 .yarn-integrity
 /config/certs/*
 !/config/certs/.keep
+/config/credentials.yml.enc
